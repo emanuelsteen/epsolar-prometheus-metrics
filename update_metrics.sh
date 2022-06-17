@@ -28,7 +28,41 @@ while true; do
 
 	echo "charging_mode $(grep "Charging mode =" 1.txt | awk '{print $4}' | sed 's/[a-zA-Z]//g')" >> metrics.new
 	echo "battery_status $(grep "Battery status =" 1.txt | awk '{print $4}' | sed 's/[a-zA-Z]//g')" >> metrics.new
-	echo "charging_equipment_status $(grep "Charging equipment status =" 1.txt | awk '{print $5}' | sed 's/[a-zA-Z]//g')" >> metrics.new
+
+	charging_equipment_status=$(grep "Charging equipment status =" 1.txt | awk '{print $5}' | sed 's/[a-zA-Z]//g')
+	echo "charging_equipment_status $charging_equipment_status" >> metrics.new
+
+	charging_equipment_status_bin=$(echo "obase=2; $charging_equipment_status" | bc | awk '{printf "%016d", $0}')
+	echo "charging_equipment_status_bin $charging_equipment_status_bin" >> metrics.new
+
+	running=$(echo "$charging_equipment_status_bin" | cut -c 16-16)
+	echo "running $running" >> metrics.new
+
+	fault=$(echo "$charging_equipment_status_bin" | cut -c 15-15)
+	echo "fault $fault" >> metrics.new
+
+	charing_status_bin=$(echo "$charging_equipment_status_bin" | cut -c 13-14)
+
+	if [[ "$charing_status_bin" = "01" ]]; then
+		float="1"
+	else
+		float="0"
+	fi
+	echo "float $float" >> metrics.new
+
+	if [[ "$charing_status_bin" = "10" ]]; then
+		boost="1"
+	else
+		boost="0"
+	fi
+	echo "boost $boost" >> metrics.new
+
+	if [[ "$charing_status_bin" = "11" ]]; then
+		equalization="1"
+	else
+		equalization="0"
+	fi
+	echo "equalization $equalization" >> metrics.new
 
 	echo "battery_temperature $(grep "Battery Temperature =" 1.txt | awk '{print $4}' | sed 's/[a-zA-Z°]//g')" >> metrics.new
 
