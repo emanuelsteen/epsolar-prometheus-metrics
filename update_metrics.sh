@@ -66,6 +66,55 @@ while true; do
 
 	echo "battery_temperature $(grep "Battery Temperature =" 1.txt | awk '{print $4}' | sed 's/[a-zA-Z°]//g')" >> metrics.new
 
+	battery_voltage=$(grep "Battery Voltage =" 1.txt | awk '{print $4}' | sed 's/[a-zA-Z]//g')
+	echo "battery_voltage $battery_voltage" >> metrics.new
+
+	volt_soc=0
+	if (( $(echo "$battery_voltage >= 12" | bc ) )); then
+		volt_soc=9
+	fi
+	if (( $(echo "$battery_voltage >= 12.5" | bc ) )); then
+		volt_soc=14
+	fi
+	if (( $(echo "$battery_voltage >= 12.8" | bc ) )); then
+		volt_soc=17
+	fi
+	if (( $(echo "$battery_voltage >= 12.9" | bc ) )); then
+		volt_soc=20
+	fi
+	if (( $(echo "$battery_voltage >= 13.0" | bc ) )); then
+		volt_soc=30
+	fi
+	if (( $(echo "$battery_voltage >= 13.1" | bc ) )); then
+		volt_soc=40
+	fi
+	if (( $(echo "$battery_voltage >= 13.2" | bc ) )); then
+		volt_soc=70
+	fi
+	if (( $(echo "$battery_voltage >= 13.225" | bc ) )); then
+		volt_soc=75
+	fi
+	if (( $(echo "$battery_voltage >= 13.25" | bc ) )); then
+		volt_soc=80
+	fi
+	if (( $(echo "$battery_voltage >= 13.275" | bc ) )); then
+		volt_soc=85
+	fi
+	if (( $(echo "$battery_voltage >= 13.3" | bc ) )); then
+		volt_soc=90
+	fi
+	if (( $(echo "$battery_voltage >= 13.35" | bc ) )); then
+		volt_soc=95
+	fi
+	if (( $(echo "$battery_voltage >= 13.4" | bc ) )); then
+		volt_soc=99
+	fi
+	if (( $(echo "$battery_voltage >= 13.6" | bc ) )); then
+		volt_soc=100
+	fi
+
+	echo "volt_soc $volt_soc" >> metrics.new
+
 	cp metrics.new metrics
 
 	sleep 10
